@@ -1,0 +1,3 @@
+rootProject.name='rxmvvm'
+include ':sample'
+include ':rxmvvm-base'
