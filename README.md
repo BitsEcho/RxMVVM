@@ -1,5 +1,5 @@
 # RxMVVM
-An Android Kotlin MVVM implementation with RxJava3 and Janko.
+An Android Kotlin MVVM implementation with RxJava3 and [Janko](https://github.com/BitsEcho/Janko).
 
 ## Usage
 
