@@ -17,6 +17,7 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -40,6 +41,6 @@ publish {
     groupId = 'com.bitsecho.rxmvvm'
     artifactId = 'rxmvvm-base'
     publishVersion = '1.0.0'
-    desc = 'An Android Kotlin MVVM implementation with ReactiveX and Janko.'
+    desc = 'An Android Kotlin MVVM implementation with RxJava3 and Janko.'
     website = 'https://github.com/BitsEcho/RxMVVM'
 }

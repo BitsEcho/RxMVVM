@@ -1,5 +1,5 @@
 # RxMVVM
-An Android Kotlin MVVM implementation with ReactiveX and Janko.
+An Android Kotlin MVVM implementation with RxJava3 and Janko.
 
 ## Usage
 
@@ -117,6 +117,11 @@ class MainVM: RxViewModel() {
     }
 }
 
+```
+
+## Installation
+```gradle
+implementation 'com.bitsecho.rxmvvm:rxmvvm-base:1.0.0'
 ```
 
 ## License
