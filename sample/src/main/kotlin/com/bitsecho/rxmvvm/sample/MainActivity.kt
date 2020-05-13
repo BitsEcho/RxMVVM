@@ -32,9 +32,9 @@ class MainActivity : RxActivity() {
 
     //Bind Model to View
     override fun bindModelData() {
-        vm<MainVM>().text.obs.compose(bindLifeCycle())
+        vm<MainVM>().text.obs.compose(bindLifeCycle()) // Subscribe Model Observable
             .subscribe {
-                find<AppCompatTextView>(R.id.text).ui { //
+                find<AppCompatTextView>(R.id.text).ui { // View Change
                     text = it
                 }
             }
