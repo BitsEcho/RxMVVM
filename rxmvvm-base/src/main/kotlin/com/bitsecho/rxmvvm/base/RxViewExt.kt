@@ -2,7 +2,6 @@ package com.bitsecho.rxmvvm.base
 
 import android.view.View
 import com.bitsecho.util.RxBus
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 
 fun View.click(): Observable<Boolean> {
@@ -35,5 +34,5 @@ private fun triggerEvent(block:(trigger: ()->Unit)->Unit): Observable<Boolean> {
     val clickBus = RxBus<Boolean>()
     val trigger  = { clickBus.post(true) }
     block(trigger)
-    return clickBus.obs.observeOn(AndroidSchedulers.mainThread())
+    return clickBus.obs
 }

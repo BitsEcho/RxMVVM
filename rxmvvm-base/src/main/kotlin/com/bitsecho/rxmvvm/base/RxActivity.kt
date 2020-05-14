@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bitsecho.janko.base.UI
 import com.bitsecho.janko.base.setContentView
 import com.bitsecho.util.RxBus
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -65,7 +64,7 @@ abstract class RxActivity: AppCompatActivity() {
 
     inner class RxOptionMenu {
         val rxMenuItemBus = RxBus<MenuItem>()
-        fun selected(): Observable<MenuItem> = rxMenuItemBus.obs.observeOn(AndroidSchedulers.mainThread())
+        fun selected(): Observable<MenuItem> = rxMenuItemBus.obs
     }
 }
 
