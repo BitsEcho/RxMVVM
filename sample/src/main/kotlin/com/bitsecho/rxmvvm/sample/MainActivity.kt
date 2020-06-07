@@ -10,11 +10,10 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.Toolbar
 import com.bitsecho.janko.appcompat.lparams
 import com.bitsecho.janko.base.*
-import com.bitsecho.rxmvvm.base.RxActivity
-import com.bitsecho.rxmvvm.base.RxModel
-import com.bitsecho.rxmvvm.base.RxViewModel
+import com.bitsecho.rxmvvm.base.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class MainActivity : RxActivity() {
     //To appoint a ViewModel
@@ -25,9 +24,11 @@ class MainActivity : RxActivity() {
 
     //Bind View event to ViewModel event
     override fun bindViewEvent() {
-        find<Button>(R.id.button).onClick { //View event
-            vm<MainVM>().refreshTime() //ViewModel event
-        }
+        find<Button>(R.id.button).click()
+            .throttleFirst(1, TimeUnit.SECONDS)
+            .subscribe {
+                vm<MainVM>().refreshTime() //ViewModel event
+            }.disposeOnDestroy(this)
     }
 
     //Bind Model to View
@@ -37,7 +38,12 @@ class MainActivity : RxActivity() {
                 find<AppCompatTextView>(R.id.text).ui { // View Change
                     text = it
                 }
-            }
+            }.disposeOnDestroy(this)
+
+        vm<MainVM>().error.obs.compose(bindLifeCycle()) // Handle ViewModel error
+            .subscribe {
+                toast(it.message)
+            }.disposeOnDestroy(this)
     }
 
     //Do some others after two way binding

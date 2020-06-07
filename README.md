@@ -14,6 +14,10 @@ An Android Kotlin MVVM implementation with RxJava3 and [Janko](https://github.co
    - bindViewEvent(), use view rx event to trigger ViewModel event
    - bindModelData(), use Model.obs in ViewModel to trigger View change
    - onPostBinding(), after appointXX() and bindXX() will call this function
+5. Friendly Tools in RxActivity
+    - registerLifeCycle(), use separate lift cycle, no need handle every lib life cycle all in onResume(), onPause() and onDestroy()
+    - subscribeActivityResult(), subscribe Activity Result with requestCode and returnCode as Key
+    - subscribeOptionItemSelected(), subscribe Option Item when selected with menuItem id as Key
 
 ## Sample
 
@@ -29,9 +33,11 @@ class MainActivity : RxActivity() {
 
     //Bind View event to ViewModel event
     override fun bindViewEvent() {
-        find<Button>(R.id.button).onClick { //View event
-            vm<MainVM>().refreshTime() //ViewModel event
-        }
+        find<Button>(R.id.button).click()
+            .throttleFirst(1, TimeUnit.SECONDS)
+            .subscribe {
+                vm<MainVM>().refreshTime() //ViewModel event
+            }.disposeOnDestroy(this)
     }
 
     //Bind Model to View
@@ -41,7 +47,12 @@ class MainActivity : RxActivity() {
                 find<AppCompatTextView>(R.id.text).ui { // View Change
                     text = it
                 }
-            }
+            }.disposeOnDestroy(this)
+
+        vm<MainVM>().error.obs.compose(bindLifeCycle()) // Handle ViewModel error
+            .subscribe {
+                toast(it.message)
+            }.disposeOnDestroy(this)
     }
 
     //Do some others after two way binding

@@ -1,5 +1,6 @@
 package com.bitsecho.rxmvvm.base
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -16,14 +17,17 @@ fun Disposable.disposeOnDestroy(rxActivity: RxActivity) = rxActivity.compositeDi
 abstract class RxActivity: AppCompatActivity() {
     val compositeDisposable = CompositeDisposable()
     private lateinit var rxViewModel: RxViewModel
-    protected val rxOptionMenu = RxOptionMenu()
     private var isRunning = false
+    private val activityCodeMap = HashMap<String, RxBus<Intent>>()
+    private val optionMenuIdMap = HashMap<Int, RxBus<MenuItem>>()
+    private val lifeCycleList = mutableListOf<LifeCycle>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isRunning = true
         rxViewModel = appointVM()
         appointUI().setContentView(this)
+        initLifeCycles()
         bindViewEvent()
         bindModelData()
         onPostBinding(savedInstanceState)
@@ -39,33 +43,72 @@ abstract class RxActivity: AppCompatActivity() {
 
     protected fun <T>bindLifeCycle(): ObservableTransformer<T, T> =  ObservableTransformer { it.filter { isRunning } }
 
+    private fun initLifeCycles() {
+        val isRunningLifeCycle = object: LifeCycle {
+            override fun onResume() { isRunning = true }
+            override fun onPause() { isRunning = false }
+            override fun onDestroy() { isRunning = false }
+        }
+
+        val rxViewModelLifeCycle = object: LifeCycle {
+            override fun onResume() = rxViewModel.onResume()
+            override fun onPause() = rxViewModel.onPause()
+            override fun onDestroy() = rxViewModel.onDestroy()
+        }
+
+        registerLifeCycle(isRunningLifeCycle)
+        registerLifeCycle(rxViewModelLifeCycle)
+    }
+
     override fun onResume() {
         super.onResume()
-        isRunning = true
-        rxViewModel.onResume()
+        lifeCycleList.forEach { it.onResume() }
     }
 
     override fun onPause() {
-        rxViewModel.onPause()
-        isRunning = false
+        lifeCycleList.forEach { it.onPause() }
         super.onPause()
     }
 
     override fun onDestroy() {
-        compositeDisposable.dispose()
-        rxViewModel.onDestroy()
+        lifeCycleList.forEach { it.onDestroy() }
         super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        rxOptionMenu.rxMenuItemBus.post(item)
+        val menuItemBus = optionMenuIdMap[item.itemId]
+        menuItemBus?.post(item)
         return true
     }
 
-    inner class RxOptionMenu {
-        val rxMenuItemBus = RxBus<MenuItem>()
-        fun selected(): Observable<MenuItem> = rxMenuItemBus.obs
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val codeKey = ""+requestCode+"_"+resultCode
+        activityCodeMap[codeKey]?.post(data?: Intent())
     }
+
+    fun subscribeActivityResult(requestCode: Int, resultCode: Int): Observable<Intent> {
+        val activityCodeKey = ""+requestCode+"_"+resultCode
+        val bus = RxBus<Intent>()
+        activityCodeMap[activityCodeKey] = bus
+        return bus.obs
+    }
+
+    fun subscribeOptionItemSelected(itemId: Int): Observable<MenuItem> {
+        val bus = RxBus<MenuItem>()
+        optionMenuIdMap[itemId] = bus
+        return bus.obs
+    }
+
+    fun registerLifeCycle(lifeCycle: LifeCycle) {
+        lifeCycleList.add(lifeCycle)
+    }
+}
+
+interface LifeCycle {
+    fun onResume()
+    fun onPause()
+    fun onDestroy()
 }
 
 
