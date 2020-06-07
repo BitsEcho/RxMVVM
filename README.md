@@ -1,5 +1,5 @@
 # RxMVVM
-[ ![Download](https://api.bintray.com/packages/bitsecho/maven/rxmvvm-base/images/download.svg?version=1.0.1) ](https://bintray.com/bitsecho/maven/rxmvvm-base/1.0.1/link)
+[ ![Download](https://api.bintray.com/packages/bitsecho/maven/rxmvvm-base/images/download.svg?version=1.1.0) ](https://bintray.com/bitsecho/maven/rxmvvm-base/1.1.0/link)
 
 An Android Kotlin MVVM implementation with RxJava3 and [Janko](https://github.com/BitsEcho/Janko).
 
@@ -134,7 +134,7 @@ class MainVM: RxViewModel() {
 
 ## Installation
 ```gradle
-implementation 'com.bitsecho.rxmvvm:rxmvvm-base:1.0.1'
+implementation 'com.bitsecho.rxmvvm:rxmvvm-base:1.1.0'
 ```
 
 ## License
