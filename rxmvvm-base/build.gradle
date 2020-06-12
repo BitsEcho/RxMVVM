@@ -11,7 +11,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 29
         versionCode 1
-        versionName "1.1.0"
+        versionName "1.1.1"
     }
 
     sourceSets {
@@ -39,7 +39,7 @@ publish {
     userOrg = 'bitsecho'
     groupId = 'com.bitsecho.rxmvvm'
     artifactId = 'rxmvvm-base'
-    publishVersion = '1.1.0'
+    publishVersion = '1.1.1'
     desc = 'An Android Kotlin MVVM implementation with RxJava3 and Janko.'
     website = 'https://github.com/BitsEcho/RxMVVM'
 }

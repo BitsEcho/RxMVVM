@@ -7,28 +7,32 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.text.ParseException
 
-object StatusCode {
-    const val SUCCESS = 200
-    const val BAD_REQUEST = 400
-    const val NOT_FOUND = 404
-    const val REQUEST_TIMEOUT = 408
-    const val UNPROCESSABLE_ENTITY = 422
-    const val UNKNOWN_ERROR = 520
+enum class StatusCode(val code: Int, val message: String) {
+    OK(200, "OK"),
+    BAD_REQUEST(400, "Bad Request"),
+    NOT_FOUND(404, "Not Found"),
+    REQUEST_TIMEOUT(408, "Request Timeout"),
+    UNPROCESSABLE_ENTITY(422, "Unprocessable Entity"),
+    UNKNOWN_ERROR(500, "Unknown Error")
 }
 
 class AppException(val code: Int, override val message: String): RuntimeException()
 
+fun StatusCode.toAppException(): AppException {
+    return AppException(this.code, this.message)
+}
+
 open class AppExceptionConverter {
     open fun convert(e: Throwable): AppException {
         return when (e) {
-            is SocketTimeoutException -> AppException(StatusCode.REQUEST_TIMEOUT, "Request Timeout")
+            is SocketTimeoutException -> StatusCode.REQUEST_TIMEOUT.toAppException()
             is ConnectException,
-            is UnknownHostException -> AppException(StatusCode.NOT_FOUND, "Not Found")
+            is UnknownHostException -> StatusCode.NOT_FOUND.toAppException()
             is JSONException,
-            is ParseException -> AppException(StatusCode.UNPROCESSABLE_ENTITY, "Unprocessable Entity")
-            is IllegalArgumentException -> AppException(StatusCode.BAD_REQUEST, "Bad Request")
+            is ParseException -> StatusCode.UNPROCESSABLE_ENTITY.toAppException()
+            is IllegalArgumentException -> StatusCode.BAD_REQUEST.toAppException()
             is AppException -> e
-            else -> AppException(StatusCode.UNKNOWN_ERROR, "Unknown Error")
+            else -> StatusCode.UNKNOWN_ERROR.toAppException()
         }
     }
 }
